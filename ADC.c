@@ -21,36 +21,27 @@ la captura será en Matlab en 6 graficas.
      //Pag 396 para inicializar el modulo de reloj del adc RCGCADC
     SYSCTL->RCGCADC = (1<<0); 
     //Pag 382 (RGCGPIO) Puertos base habilitación del reloj
-    //                     F     E      D       C      B     A
-    SYSCTL->RCGCGPIO |= (1<<5)|(1<<4)|(1<<3)|(0<<2)|(0<<1)|(1<<0);
+    SYSCTL->RCGCGPIO |= (1<<4) | (1<<3) | (1<<0);
     //(GPIOAFSEL) pag.770 Enable alternate función para que el modulo analógico tenga control de esos pines
-    GPIOE->AFSEL = (0<<2); 
-    GPIOD->AFSEL = (0<<0);
-    GPIOB->AFSEL = (0<<4);
-    GPIOE->AFSEL =  (1<<1);
-    GPIOD->AFSEL =  (1<<3) | (1<<1);
+    GPIOE->AFSEL = 0x0000; 
+    GPIOD->AFSEL = 0x0000;
+    GPIOB->AFSEL = 0x0000;
     //Pag 760 (GPIODIR) Habilta los pines como I/O un cero para entrada y un uno para salida
-    GPIOE->DIR = (0<<1); //PE5 y PE4
-    GPIOD->DIR = (0<<3) | (0<<1);
-    GPIOE->DIR = (0<<2); 
-    GPIOD->DIR = (0<<0);
-    GPIOB->DIR = (0<<4);
+    GPIOE->DIR |= (0<<2) | (0<<1); //PE5 y PE4
+    GPIOD->DIR |= (0<<3) | (0<<1) | (0<<0);
+    GPIOB->DIR |= (0<<4);
     //(GPIODEN) pag.781 desabilita el modo digital
-    GPIOE->DEN = (0<<1);
-    GPIOD->DEN = (0<<3) | (0<<1);
-    GPIOE->DEN = (0<<2); 
-    GPIOD->DEN = (0<<0);
-    GPIOB->DEN = (0<<4);
+    GPIOE->DEN |= (0<<2) | (0<<1);
+    GPIOD->DEN |= (0<<3) | (0<<1) | (0<<0);
+    GPIOB->DEN |= (0<<4);
     //Pag 787 GPIOPCTL registro combinado con el GPIOAFSEL y la tabla pag 1808
     GPIOE->PCTL = GPIOE->PCTL & (0xFFFFF00F);
     GPIOD->PCTL = GPIOD->PCTL & (0xFFFF0F00);
     GPIOB->PCTL = GPIOB->PCTL & (0xFFF0FFFF);
     //(GPIOAMSEL) pag.786 habilitar analogico
-    GPIOE->AMSEL = (1<<1);
-    GPIOD->AMSEL = (1<<3) | (1<<1);
-    GPIOE->AMSEL = (1<<2); 
-    GPIOD->AMSEL = (1<<0);
-    GPIOB->AMSEL = (1<<4);
+    GPIOE->AMSEL |= (1<<1) | (1<<2);
+    GPIOD->AMSEL |= (1<<3) | (1<<1) | (1<<0);
+    GPIOB->AMSEL |= (1<<4);
     //Pag 1159 El registro (ADCPC) establece la velocidad de conversión por segundo
     ADC0->PC = 0x7;//1Mksps
     //Pag 1099 Este registro (ADCSSPRI) configura la prioridad de los secuenciadores
