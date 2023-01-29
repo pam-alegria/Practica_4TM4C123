@@ -18,6 +18,7 @@ d),11,9,6,7,4,2 33MHZ 19200 -sec3,sec0,sec2
 e)1,5,7,11,6,8 80MHZ 4800 -sec0 ,sec3
 la captura será en Matlab en 6 graficas.
     */
+   /*
      //Pag 396 para inicializar el modulo de reloj del adc RCGCADC
     SYSCTL->RCGCADC = (1<<0); 
     //Pag 382 (RGCGPIO) Puertos base habilitación del reloj
@@ -58,13 +59,50 @@ la captura será en Matlab en 6 graficas.
     ADC0->SSCTL1 = (1<<1) | (1<<2) | (1<<5) | (1<<6) | (1<<8) | (1<<9) | (1<<13);
     ADC0->SSCTL3 = (1<<0);
     ADC0->SSCTL2 = (1<<1) | (1<<2);
-    /* Enable ADC Interrupt */
-    ADC0->IM |= (0<<1) | (0<<2) | (0<<3); /* Unmask ADC0 sequence 2 interrupt pag 1082*/
+    // Enable ADC Interrupt 
+    ADC0->IM |= (0<<1) | (0<<2) | (0<<3); // Unmask ADC0 sequence 2 interrupt pag 1082
     //NVIC_PRI4_R = (NVIC_PRI4_R & 0xFFFFFF00) | 0x00000020;
     //NVIC_EN0_R = 0x00010000;
     //Pag 1077 (ADCACTSS) Este registro controla la activación de los secuenciadores
     ADC0->ACTSS = (1<<3) | (1<<2) | (1<<1) | (0<<0);
     //ADC0->PSSI |= (1<<1);
+    */
+
+   SYSCTL->RCGCADC = (1<<0); 
+   SYSCTL->RCGCGPIO |= (1<<4) | (1<<3) | (1<<1); //Habilitar el puerto E, D y B para los canales
+   //Configurar el canal 8 a una velocidad de 1 Msps
+   //SS2 secuenciador de 2 muestra del convertidor por software
+   GPIOE->AFSEL = 0x0000; //Para ver que funcion alternativa usar
+   GPIOD->AFSEL = 0X0000;
+   GPIOB->AFSEL = 0X0000;
+   GPIOE->DIR |= (0<<2) | (0<<1); //usar el pin 4, 2 Y 0 del puerto E como entrada 0 Entrada | 1 Salida
+   GPIOD->DIR |= (0<<3) | (0<<1) | (0<<0);
+   GPIOB->DIR |= (0<<4);
+   GPIOE->DEN |= 0x00; //Desactivamos la funcion digital porque es analogico
+   GPIOD->DEN |= 0X00; 
+   GPIOB->DEN |= 0X00;
+   GPIOE->PCTL = (GPIOE->PCTL & 0xFFFFF00F); //Se limpia el registro de control.
+   GPIOD->PCTL = (GPIOD->PCTL & 0xFFFF0F00);
+   GPIOB->PCTL = (GPIOB->PCTL & 0xFFF0FFFF);
+   GPIOE->AMSEL |= (0<<2) | (0<<1); //Activamos el pin 3 y 2 como analogico. 
+   GPIOD->AMSEL |= (0<<3) | (0<<1) | (0<<0);
+   GPIOB->AMSEL |= (1<<4);
+   ADC0->SSPRI = 0x1203;
+   ADC0->PC = 0x7;
+   //Configuracion de la secuencia de muestreo//(Se puede programar)
+   ADC0->ACTSS = (0<<3) | (0<<2) | (0<<1) | (0<<0); //Desabilitar el registro del secuenciador
+   ADC0->EMUX = (0x0<<12) | (0x0<<8) | (0x0<<4);
+   ADC0->SSMUX2 = (ADC0->SSMUX2 & ~0xFFFF) | (1<<0);
+   ADC0->SSMUX1 = (ADC0->SSMUX1 & ~0x0F) | (2<<0) | (4<<4) | (6<<8) | (7<<12);
+   ADC0->SSMUX3 = (ADC0->SSMUX3 & ~0x0F) | (10<0);
+   ADC0->SSCTL2 = (1<<2) | (1<<1);
+   ADC0->SSCTL1 = (1<<2) | (1<<6) | (1<<9) | (1<<13);
+   ADC0->SSCTL3 = (1<<2) | (1<<1);
+   ADC0->IM = (1<<3) | (1<<2) | (1<<1); //Deshabilita la mascara de la interrupcion
+   ADC0->ACTSS = (1<<3) | (1<<2) | (1<<1) | (1<<0);
+   ADC0->PSSI |= (1<<3) | (1<<2) | (1<<1);
+
+
 }
 
 /*
